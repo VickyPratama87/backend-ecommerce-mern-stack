@@ -7,11 +7,19 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import ExpressMongoSanitize from 'express-mongo-sanitize';
+import { v2 as cloudinary } from 'cloudinary';
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Configuration
+cloudinary.config({
+	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
+	api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // Middlewares
 app.use(express.json());

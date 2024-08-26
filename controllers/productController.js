@@ -1,5 +1,7 @@
 import Product from '../models/productModel.js';
 import asyncHandler from '../middlewares/asyncHandler.js';
+import { v2 as cloudinary } from 'cloudinary';
+import streamifier from 'streamifier';
 
 export const getAllProducts = asyncHandler(async (req, res) => {
 	// Filtering
@@ -96,17 +98,43 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 });
 
 export const uploadFileProduct = asyncHandler(async (req, res) => {
-	const file = req.file;
-	if (!file) {
-		res.status(400);
-		throw new Error('Please upload a file');
-	}
+	// Without Cloudinary
 
-	const imageFileName = file.filename;
-	const pathImageFile = `/uploads/${imageFileName}`;
+	// {
+	// 	const file = req.file;
+	// 	if (!file) {
+	// 		res.status(400);
+	// 		throw new Error('Please upload a file');
+	// 	}
+	// 	const imageFileName = file.filename;
+	// 	const pathImageFile = `/uploads/${imageFileName}`;
+	// 	res.status(200).json({
+	// 		message: 'Success upload file',
+	// 		image: pathImageFile,
+	// 	});
+	// }
 
-	res.status(200).json({
-		message: 'Success upload file',
-		image: pathImageFile,
-	});
+	// With Cloudinary
+	const stream = cloudinary.uploader.upload_stream(
+		{
+			folder: 'uploads',
+			allowed_formats: ['jpg', 'png', 'jpeg'],
+		},
+		function (err, result) {
+			if (err) {
+				console.log(err);
+				return res.status(500).json({
+					message: 'Failed to upload image',
+					error: err,
+				});
+			}
+
+			res.json({
+				message: 'Success upload image',
+				url: result.secure_url,
+			});
+		}
+	);
+
+	streamifier.createReadStream(req.file.buffer).pipe(stream);
 });
