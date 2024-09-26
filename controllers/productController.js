@@ -21,12 +21,13 @@ export const getAllProducts = asyncHandler(async (req, res) => {
 
 	// Pagination
 	const page = parseInt(req.query.page) || 1;
-	const limitData = parseInt(req.query.limit) || 30;
+	// const limitData = parseInt(req.query.limit) || 10;
+	const limitData = parseInt(req.query.limit) || 3;
 	const skipData = (page - 1) * limitData;
 
 	query = query.skip(skipData).limit(limitData);
 
-	let countProduct = await Product.countDocuments();
+	let countProduct = await Product.countDocuments(queryObj);
 	if (req.query.page) {
 		if (skipData >= countProduct) {
 			res.status(404);
@@ -35,11 +36,16 @@ export const getAllProducts = asyncHandler(async (req, res) => {
 	}
 
 	const products = await query;
+	const totalPage = Math.ceil(countProduct / limitData);
 
 	return res.status(200).json({
 		message: 'Success get all products',
 		data: products,
-		count: countProduct,
+		pagination: {
+			totalPage,
+			page,
+			totalProduct: countProduct,
+		},
 	});
 });
 
