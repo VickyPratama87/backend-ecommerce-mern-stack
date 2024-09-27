@@ -138,20 +138,20 @@ export const callbackPayment = asyncHandler(async (req, res) => {
 
 	if (transactionStatus == 'capture' || transactionStatus == 'settlement') {
 		if (fraudStatus == 'accept') {
-			const orderProduct = orderData.itemDetails;
+			// const orderProduct = orderData.itemDetails;
 
-			for (const itemProduct of orderProduct) {
-				const productData = await Product.findById(itemProduct.product);
+			// for (const itemProduct of orderProduct) {
+			// 	const productData = await Product.findById(itemProduct.product);
 
-				if (!productData) {
-					res.status(404);
-					throw new Error('Product not found');
-				}
+			// 	if (!productData) {
+			// 		res.status(404);
+			// 		throw new Error('Product not found');
+			// 	}
 
-				productData.stock -= itemProduct.quantity;
+			// 	productData.stock -= itemProduct.quantity;
 
-				await productData.save();
-			}
+			// 	await productData.save();
+			// }
 			orderData.status = 'success';
 		}
 	} else if (transactionStatus == 'cancel' || transactionStatus == 'deny' || transactionStatus == 'expire') {
