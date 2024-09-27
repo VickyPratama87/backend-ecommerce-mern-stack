@@ -127,7 +127,7 @@ export const callbackPayment = asyncHandler(async (req, res) => {
 	const statusResponse = await snap.transaction.notification(req.body);
 	let orderId = statusResponse.order_id;
 	let transactionStatus = statusResponse.transaction_status;
-	let fraudStatus = statusResponse.fraud_status;
+	// let fraudStatus = statusResponse.fraud_status;
 
 	const orderData = await Order.findById(orderId);
 
@@ -137,23 +137,21 @@ export const callbackPayment = asyncHandler(async (req, res) => {
 	}
 
 	if (transactionStatus == 'capture' || transactionStatus == 'settlement') {
-		if (fraudStatus == 'accept') {
-			// const orderProduct = orderData.itemDetails;
+		const orderProduct = orderData.itemDetails;
 
-			// for (const itemProduct of orderProduct) {
-			// 	const productData = await Product.findById(itemProduct.product);
+		for (const itemProduct of orderProduct) {
+			const productData = await Product.findById(itemProduct.product);
 
-			// 	if (!productData) {
-			// 		res.status(404);
-			// 		throw new Error('Product not found');
-			// 	}
+			if (!productData) {
+				res.status(404);
+				throw new Error('Product not found');
+			}
 
-			// 	productData.stock -= itemProduct.quantity;
+			productData.stock -= itemProduct.quantity;
 
-			// 	await productData.save();
-			// }
-			orderData.status = 'success';
+			await productData.save();
 		}
+		orderData.status = 'success';
 	} else if (transactionStatus == 'cancel' || transactionStatus == 'deny' || transactionStatus == 'expire') {
 		orderData.status = 'failed';
 	} else if (transactionStatus == 'pending') {
