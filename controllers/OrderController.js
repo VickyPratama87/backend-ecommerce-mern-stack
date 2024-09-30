@@ -30,7 +30,12 @@ export const createOrder = asyncHandler(async (req, res) => {
 			throw new Error(`Product not found `);
 		}
 
-		const { name, price, _id } = productData;
+		const { name, price, _id, stock } = productData;
+
+		if (cart.quantity > stock) {
+			res.status(400);
+			throw new Error(`Stock ${name} is not enough`);
+		}
 
 		// For MongoDB
 		const singleProduct = {

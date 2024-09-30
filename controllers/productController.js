@@ -22,7 +22,7 @@ export const getAllProducts = asyncHandler(async (req, res) => {
 	// Pagination
 	const page = parseInt(req.query.page) || 1;
 	// const limitData = parseInt(req.query.limit) || 10;
-	const limitData = parseInt(req.query.limit) || 3;
+	const limitData = parseInt(req.query.limit) || 4;
 	const skipData = (page - 1) * limitData;
 
 	query = query.skip(skipData).limit(limitData);
